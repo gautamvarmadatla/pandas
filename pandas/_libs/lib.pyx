@@ -399,6 +399,8 @@ def dicts_to_array(dicts: list, columns: list):
     return result
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def fast_zip(list ndarrays) -> ndarray[object]:
     """
     For zipping multiple ndarrays into an ndarray of tuples.
@@ -441,6 +443,8 @@ def fast_zip(list ndarrays) -> ndarray[object]:
     return result
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def get_reverse_indexer(const intp_t[:] indexer, Py_ssize_t length) -> ndarray:
     """
     Reverse indexing operation.
@@ -512,6 +516,8 @@ def has_only_ints_or_nan(const floating[:] arr) -> bool:
     return True
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def maybe_indices_to_slice(ndarray[intp_t, ndim=1] indices, intp_t max_len):
     cdef:
         Py_ssize_t i, n = len(indices)
@@ -2185,6 +2191,8 @@ cdef bint is_datetime_or_datetime64_array(ndarray values, bint skipna=True):
 
 
 # Note: only python-exposed for tests
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def is_datetime_with_singletz_array(values: ndarray) -> bool:
     """
     Check values have the same tzinfo attribute.
@@ -2312,6 +2320,8 @@ cdef bint is_period_array(ndarray values, bint skipna=True):
 
 
 # Note: only python-exposed for tests
+@cython.wraparound(False)
+@cython.boundscheck(False)
 cpdef bint is_interval_array(ndarray values):
     """
     Is this an ndarray of Interval (or np.nan) with a single dtype?
@@ -3143,6 +3153,8 @@ def map_infer(
         return result
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def to_object_array(rows: object, min_width: int = 0) -> ndarray:
     """
     Convert a list of lists into an object array.
@@ -3203,6 +3215,8 @@ def tuples_to_object_array(ndarray[object] tuples):
     return result
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def to_object_array_tuples(rows: object) -> np.ndarray:
     """
     Convert a list of tuples into an object array. Any subclass of
@@ -3311,6 +3325,8 @@ def is_bool_list(obj: list) -> bool:
     return True
 
 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 cpdef ndarray eq_NA_compat(ndarray[object] arr, object key):
     """
     Check for `arr == key`, treating all values as not-equal to pd.NA.

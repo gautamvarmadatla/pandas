@@ -793,7 +793,7 @@ class Styler(StylerRenderer):
               - `"all;index"`: as above with lines extending only the width of the
                 index entries.
               - `"skip-last;data"`: a cline is added for each index value except the
-                last level (which is never sparsified), extending the widtn of the
+                last level (which is never sparsified), extending the width of the
                 table.
               - `"skip-last;index"`: as above with lines extending only the width of the
                 index entries.
@@ -1032,7 +1032,7 @@ class Styler(StylerRenderer):
 
         **CSS Conversion**
 
-        This method can convert a Styler constructured with HTML-CSS to LaTeX using
+        This method can convert a Styler constructed with HTML-CSS to LaTeX using
         the following limited conversions.
 
         ================== ==================== ============= ==========================
@@ -1802,7 +1802,7 @@ class Styler(StylerRenderer):
                     continue
                 css_list = maybe_convert_css_to_tuples(c)
                 i = self.index.get_loc(rn)
-                self.ctx[(i, j)].extend(css_list)
+                self.ctx[(i, j)].extend(css_list)  # type: ignore[index]
 
     def _update_ctx_header(self, attrs: DataFrame, axis: AxisInt) -> None:
         """
@@ -2137,7 +2137,7 @@ class Styler(StylerRenderer):
         ----------
         func : function
             ``func`` should take a Series and return a string array of the same length.
-        axis : {{0, 1, "index", "columns"}}
+        axis : {0, 1, "index", "columns"}
             The headers over which to apply the function.
         level : int, str, list, optional
             If index is MultiIndex the level(s) over which to apply the function.
@@ -2214,7 +2214,7 @@ class Styler(StylerRenderer):
         ----------
         func : function
             ``func`` should take a scalar and return a string.
-        axis : {{0, 1, "index", "columns"}}
+        axis : {0, 1, "index", "columns"}
             The headers over which to apply the function.
         level : int, str, list, optional
             If index is MultiIndex the level(s) over which to apply the function.
@@ -2870,7 +2870,7 @@ class Styler(StylerRenderer):
         elif isinstance(table_styles, dict):
             axis = self.data._get_axis_number(axis)
             obj = self.data.index if axis == 1 else self.data.columns
-            idf = f".{self.css['row']}" if axis == 1 else f".{self.css['col']}"
+            idf = f".{self.css['row']}" if axis == 1 else f".{self.css['col']}"  # pyright: ignore[reportOptionalSubscript]
 
             table_styles = [
                 {
@@ -3106,7 +3106,7 @@ class Styler(StylerRenderer):
         # Returns a boolean mask indicating where `self.data` has numerical columns.
         # Choosing a mask as opposed to the column names also works for
         # boolean column labels (GH47838).
-        return self.data.columns.isin(self.data.select_dtypes(include=np.number))
+        return self.data.columns.isin(self.data.select_dtypes(include=np.number))  # type: ignore[arg-type]
 
     def background_gradient(
         self,
@@ -3139,7 +3139,7 @@ class Styler(StylerRenderer):
             Compress the color range at the high end. This is a multiple of the data
             range to extend above the maximum; good values usually in [0, 1],
             defaults to 0.
-        axis : {{0, 1, "index", "columns", None}}, default 0
+        axis : {0, 1, "index", "columns", None}, default 0
             Apply to each column (``axis=0`` or ``'index'``), to each row
             (``axis=1`` or ``'columns'``), or to the entire DataFrame at once
             with ``axis=None``.
@@ -3296,7 +3296,7 @@ class Styler(StylerRenderer):
             Compress the color range at the high end. This is a multiple of the data
             range to extend above the maximum; good values usually in [0, 1],
             defaults to 0.
-        axis : {{0, 1, "index", "columns", None}}, default 0
+        axis : {0, 1, "index", "columns", None}, default 0
             Apply to each column (``axis=0`` or ``'index'``), to each row
             (``axis=1`` or ``'columns'``), or to the entire DataFrame at once
             with ``axis=None``.
