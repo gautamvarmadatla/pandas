@@ -1267,7 +1267,7 @@ cpdef bint is_decimal(object obj):
     return isinstance(obj, Decimal)
 
 
-def maybe_convert_lossy_decimal_ints(ndarray[object] arr) -> ndarray:
+def maybe_convert_lossy_decimal_ints(ndarray[object] arr) -> tuple:
     """
     Convert large integral Decimal values to Python int to avoid precision loss.
 
@@ -1282,36 +1282,53 @@ def maybe_convert_lossy_decimal_ints(ndarray[object] arr) -> ndarray:
 
     Returns
     -------
-    ndarray[object]
+    tuple[ndarray[object], bool]
+        The (possibly modified) array and a boolean that is True only when
+        every non-null value was converted to a large Python int and at least
+        one null is present, indicating the caller must keep the column as
+        object dtype to preserve exact integer values.
     """
     # GH#61667
     cdef:
         Py_ssize_t i, n = len(arr)
         object val
-        object out = None
+        ndarray[object] out = None
+        object check_val = 2**53
+        bint seen_non_null = False
+        bint is_dec
+        bint has_null = False
+        bint some_not_converted = False
 
     for i in range(n):
         val = arr[i]
-        if val is not None:
-            if not is_decimal(val):
-                return arr
-            break
-
-    for i in range(n):
-        val = arr[i]
-        if not is_decimal(val):
+        if val is None:
+            has_null = True
             continue
+
+        is_dec = is_decimal(val)
+
+        if not seen_non_null:
+            seen_non_null = True
+            if not is_dec:
+                return arr, False
+
+        if not is_dec:
+            some_not_converted = True
+            continue
+
         try:
-            if val == val.to_integral_value() and abs(val) > 2**53:
+            if val == val.to_integral_value() and abs(val) > check_val:
                 if out is None:
                     out = arr.copy()
                 out[i] = int(val)
+            else:
+                some_not_converted = True
         except (InvalidOperation, OverflowError):
-            pass
+            some_not_converted = True
 
     if out is None:
-        return arr
-    return out
+        return arr, False
+    return out, has_null and not some_not_converted
 
 
 @set_module("pandas.api.types")

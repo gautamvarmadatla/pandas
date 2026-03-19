@@ -3943,6 +3943,26 @@ def test_read_sql_query_decimal_coerce_float_fractional_still_float(
     assert v == 1.25
 
 
+def test_read_sql_query_decimal_coerce_float_large_integral_with_null_preserves_value(
+    sqlite_builtin_detect_types_decimal,
+):
+    # GH#61667: large integral Decimal + NULL column should not lose precision.
+    conn = sqlite_builtin_detect_types_decimal
+
+    conn.execute("CREATE TABLE t_gh61667_int_null (longID PANDAS_DECIMAL_GH61667)")
+    conn.execute(
+        "INSERT INTO t_gh61667_int_null (longID) VALUES (?)", ("305184080441754059",)
+    )
+    conn.execute("INSERT INTO t_gh61667_int_null (longID) VALUES (NULL)")
+
+    df = sql.read_sql_query(
+        "SELECT longID FROM t_gh61667_int_null", conn, coerce_float=True
+    )
+    assert df["longID"].dtype == object
+    assert df.loc[0, "longID"] == 305184080441754059
+    assert isna(df.loc[1, "longID"])
+
+
 @pytest.mark.db
 def test_psycopg2_schema_support(postgresql_psycopg2_engine):
     conn = postgresql_psycopg2_engine
