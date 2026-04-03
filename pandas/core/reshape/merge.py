@@ -2029,6 +2029,16 @@ class _MergeOperation:
             )
 
 
+def _maybe_promote_to_rangeindex(idx: Index) -> Index:
+    if idx.is_monotonic_increasing and idx.is_unique and idx.dtype.kind in "iu":
+        values = idx._values
+        if isinstance(values, np.ndarray):
+            result = maybe_sequence_to_range(values)
+            if isinstance(result, range):
+                return RangeIndex(result, name=idx.name)
+    return idx
+
+
 def get_join_indexers(
     left_keys: list[ArrayLike],
     right_keys: list[ArrayLike],
@@ -2099,27 +2109,9 @@ def get_join_indexers(
         lk: ArrayLike
         rk: ArrayLike
         if how == "left" and not isinstance(right, RangeIndex):
-            if (
-                right.is_monotonic_increasing
-                and right.is_unique
-                and right.dtype.kind in "iu"
-            ):
-                _rk = right._values
-                if isinstance(_rk, np.ndarray):
-                    r = maybe_sequence_to_range(_rk)
-                    if isinstance(r, range):
-                        right = RangeIndex(r, name=right.name)
+            right = _maybe_promote_to_rangeindex(right)
         elif how == "right" and not isinstance(left, RangeIndex):
-            if (
-                left.is_monotonic_increasing
-                and left.is_unique
-                and left.dtype.kind in "iu"
-            ):
-                _lk = left._values
-                if isinstance(_lk, np.ndarray):
-                    r = maybe_sequence_to_range(_lk)
-                    if isinstance(r, range):
-                        left = RangeIndex(r, name=left.name)
+            left = _maybe_promote_to_rangeindex(left)
         if how == "left":
             lk = left._values
             if (
