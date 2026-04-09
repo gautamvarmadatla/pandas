@@ -594,6 +594,20 @@ def test_as_index_series_return_frame(df):
     tm.assert_frame_equal(result2, expected2)
 
 
+def test_as_index_series_ohlc(df):
+    # GH#65140
+    grouped = df.groupby("A", as_index=False)
+    grouped2 = df.groupby(["A", "B"], as_index=False)
+
+    result = grouped["C"].ohlc()
+    expected = df.groupby("A")["C"].ohlc().reset_index()
+    tm.assert_frame_equal(result, expected)
+
+    result2 = grouped2["C"].ohlc()
+    expected2 = df.groupby(["A", "B"])["C"].ohlc().reset_index()
+    tm.assert_frame_equal(result2, expected2)
+
+
 def test_as_index_series_column_slice_raises(df):
     # GH15072
     grouped = df.groupby("A", as_index=False)
