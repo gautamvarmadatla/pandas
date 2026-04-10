@@ -607,6 +607,12 @@ def test_as_index_series_ohlc(df):
     expected2 = df.groupby(["A", "B"])["C"].ohlc().reset_index()
     tm.assert_frame_equal(result2, expected2)
 
+    df_conflict = DataFrame(
+        {"open": ["A", "A", "B", "B"], "price": [1.0, 2.0, 3.0, 4.0]}
+    )
+    with pytest.raises(ValueError, match="cannot insert open, already exists"):
+        df_conflict.groupby("open", as_index=False)["price"].ohlc()
+
 
 def test_as_index_series_column_slice_raises(df):
     # GH15072
