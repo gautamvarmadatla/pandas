@@ -163,6 +163,7 @@ Performance improvements
 - Performance improvement in :meth:`DataFrame.sort_index` and :meth:`Series.sort_index` with the ``level`` parameter when the index is already sorted and not a :class:`MultiIndex` (:issue:`64883`)
 - Performance improvement in :meth:`DataFrame.sort_values` with multiple numeric columns by avoiding unnecessary :class:`Categorical` conversion (:issue:`15389`)
 - Performance improvement in :meth:`DataFrame.sum`, :meth:`DataFrame.prod`, :meth:`DataFrame.min`, :meth:`DataFrame.max`, :meth:`DataFrame.mean`, :meth:`DataFrame.any`, and :meth:`DataFrame.all` with ``axis=1`` for multi-block DataFrames by avoiding a transpose (:issue:`51474`)
+- Performance improvement in :meth:`DataFrame.to_excel` with the ``openpyxl`` engine when using ``engine_kwargs={"write_only": True}``, reducing memory consumption (:issue:`41681`)
 - Performance improvement in :meth:`DataFrame.to_stata` when writing object-dtype datetime columns with date formats that require year/month extraction (:issue:`64555`)
 - Performance improvement in :meth:`DataFrame.unstack` and :meth:`Series.unstack` when the :class:`MultiIndex` is already sorted and the unstacked level is the last level (:issue:`65107`)
 - Performance improvement in :meth:`DatetimeIndex.month_name` and :meth:`DatetimeIndex.day_name` when using the default string dtype by using PyArrow compute instead of going through an intermediate object array (:issue:`65104`)
@@ -263,6 +264,7 @@ Interval
 
 Indexing
 ^^^^^^^^
+- Bug in :class:`Index` constructor silently accepting unhashable elements (e.g. ``list``, ``dict``, ``set``) which would later cause errors in Index operations (:issue:`20285`)
 - Bug in :meth:`DataFrame.loc` and :meth:`Series.loc` replacing the index name with the key's name when indexing with an :class:`Index` (:issue:`17110`)
 - Bug in :meth:`DataFrame.loc` raising ``ValueError`` when setting a row on a :class:`DataFrame` with no columns and the label is not in the index (:issue:`17895`)
 - Bug in :meth:`DataFrame.loc` returning incorrect dtype when the column key is a ``slice`` (:issue:`63071`)
@@ -303,6 +305,7 @@ I/O
 ^^^
 - Fixed bug in :func:`read_csv` with the ``c`` engine where an embedded ``\r`` followed by a space in an unquoted field could cause an infinite re-parsing loop, producing spurious rows or a buffer overflow (:issue:`51141`)
 - Fixed bug in :func:`read_excel` where usage of ``skiprows`` could lead to an infinite loop (:issue:`64027`)
+- Fixed bug where :func:`read_html` parsed nested tables incorrectly when using ``html5lib`` or ``bs4`` flavors (:issue:`64524`)
 - Fixed :func:`read_json` with ``lines=True`` and ``chunksize`` to respect ``nrows``
   when the requested row count is not a multiple of the chunk size (:issue:`64025`)
 - Bug in :meth:`DataFrame.__repr__` where horizontally truncated output could exceed the terminal width by up to 4 characters (:issue:`32461`)
